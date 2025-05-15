@@ -27,7 +27,7 @@ app.use('/compras', compras);
 app.use('/productos', productos);
 app.use('/proveedores', proveedores);
 app.use('/ventas', ventas);
-app.use('/api/index', index);
+app.use('/index', index);
 
 app.get('/', async (req, res) => {
   try {
