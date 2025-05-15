@@ -1,30 +1,19 @@
 const express = require("express");
-const app = express();
-const cors = require("cors");
-const pool = require("./db"); 
+const router = express.Router();
+const pool = require("./db");
 
-
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  credentials: false
-}));
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
+router.use((req, res, next) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   next();
 });
 
 // Ruta de prueba
-app.get("/", (req, res) => {
-  res.status(200).json({ status: "API funcionando" });
+router.get("/", (req, res) => {
+  res.status(200).json({ status: "API usuarios funcionando" });
 });
 
 // Endpoint para login de usuarios
-app.post("/api/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   console.log("Datos recibidos:", req.body);
 
   const { usuario, contrasena } = req.body;
@@ -45,8 +34,9 @@ app.post("/api/login", async (req, res) => {
       [usuario.trim()]
     );
 
+    client.release();
+
     if (userResult.rows.length === 0) {
-      client.release();
       return res.status(401).json({
         error: "Credenciales inválidas",
         detalles: "Usuario no encontrado"
@@ -56,14 +46,11 @@ app.post("/api/login", async (req, res) => {
     const user = userResult.rows[0];
 
     if (user.contrasena !== contrasena) {
-      client.release();
       return res.status(401).json({
         error: "Credenciales inválidas",
         detalles: "Contraseña incorrecta"
       });
     }
-
-    client.release();
 
     res.status(200).json({
       usuario: user.usuario.trim(),
@@ -84,17 +71,4 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Manejo de errores global
-app.use((err, req, res, next) => {
-  console.error("Error global:", err);
-  res.status(500).json({
-    error: "Error interno del servidor",
-    detalles: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// Iniciar servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+module.exports = router;
