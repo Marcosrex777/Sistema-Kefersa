@@ -9,7 +9,7 @@ const compras = require("./Compras");
 const productos = require("./Productos");
 const proveedores = require("./Proveedores");
 const ventas = require("./Ventas");
-const usuarios = require("./index");  // router usuarios
+const index = require("./index");  // router usuarios
 
 app.use(cors({
   origin: '*',
