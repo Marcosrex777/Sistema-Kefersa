@@ -3,7 +3,7 @@ const cors = require('cors');
 const db = require("./db"); // Tu módulo para acceder a la base de datos
 
 const app = express();
-const PORT = 3006;
+const PORT = 3000;
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
