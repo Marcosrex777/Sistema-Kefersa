@@ -9,7 +9,7 @@ const compras = require("./Compras");
 const productos = require("./Productos");
 const proveedores = require("./Proveedores");
 const ventas = require("./Ventas");
-const index = require("./index");  // router usuarios
+const usuarios = require("./usuarios");  // router usuarios
 
 app.use(cors({
   origin: '*',
@@ -27,7 +27,7 @@ app.use('/compras', compras);
 app.use('/productos', productos);
 app.use('/proveedores', proveedores);
 app.use('/ventas', ventas);
-app.use('/index', index);
+app.use('/usuarios', usuarios);
 
 app.get('/', async (req, res) => {
   try {
