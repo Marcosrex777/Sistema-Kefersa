@@ -1,31 +1,35 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const pool = require('./db'); // conexión a PostgreSQL
+const cors = require("cors");
+const pool = require("./db");
 
-// Importar módulos (asumiendo que exportan routers o funciones)
-const camiones = require('./Camiones');
-const clientes = require('./Clientes');
-const compras = require('./Compras');
-const productos = require('./Productos');
-const proveedores = require('./Proveedores');
-const ventas = require('./Ventas');
-const index = require('./index');
+const camiones = require("./Camiones");
+const clientes = require("./Clientes");
+const compras = require("./Compras");
+const productos = require("./Productos");
+const proveedores = require("./Proveedores");
+const ventas = require("./Ventas");
+const usuarios = require("./index");  // router usuarios
 
-// Middleware para parsear JSON
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: false
+}));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Definir rutas base para cada módulo
-// Aquí asumimos que cada archivo exporta un router Express o funciones para manejar rutas
-
+// Montar routers
 app.use('/camiones', camiones);
 app.use('/clientes', clientes);
 app.use('/compras', compras);
 app.use('/productos', productos);
 app.use('/proveedores', proveedores);
 app.use('/ventas', ventas);
-app.use('/index', index);
+app.use('/api/usuarios', usuarios);
 
-// Ruta de prueba para verificar conexión a BD
+// Ruta raíz para verificar conexión a BD
 app.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
