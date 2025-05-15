@@ -10,7 +10,7 @@ const corsOptions = {
 };
 
 const app = express();
-const PORT = 3003;
+const PORT = 3000;
 
 app.use(cors(corsOptions));
 app.use(express.json());
