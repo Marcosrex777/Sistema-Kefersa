@@ -1,0 +1,8 @@
+
+POST http://localhost:3002/api/retiro
+Content-Type: application/json  
+
+{
+  "codigo": "ABC123",
+  "cantidad": 5
+}

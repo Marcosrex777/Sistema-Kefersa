@@ -1,0 +1,14 @@
+
+POST http://localhost:3003/api/proveedores
+Content-Type: application/json  
+
+{
+    "id_proveedor": "534534",
+    "nombre": "lA BENDCION",
+    "contacto": "juhu",
+    "direccion": "klñkñ",
+    "telefono": "78945624",
+    "correo": "fdgfdg@gmail.com"
+
+
+}

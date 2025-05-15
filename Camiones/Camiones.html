@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Camiones</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+            border: none;
+            outline: none;
+            transition: 0.3s;
+            font-weight: 600;
+            color: #555;
+        }
+        .tab:hover {
+            background-color: #e9e9e9;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #2e7d32;
+            color: #2e7d32;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h1 {
+            font-size: 1.5em;
+            margin-top: 0;
+            color: #2e7d32;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .divider {
+            border-top: 1px solid #e0e0e0;
+            margin: 15px 0;
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .stats-table th, .stats-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .stats-table th {
+            background-color: #f8f8f8;
+            color: #2e7d32;
+        }
+        .required::after {
+            content: " *";
+            color: #d32f2f;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            background-color: #2e7d32;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+        .history-entry {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f8f8f8;
+            border-left: 4px solid #2e7d32;
+        }
+        .history-time {
+            font-weight: bold;
+            color: #555;
+        }
+        .history-action {
+            color: #2e7d32;
+        }
+        .history-details {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="notification" id="notification"></div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="openTab(event, 'registro')">Registro</button>
+        <button class="tab" onclick="openTab(event, 'busqueda')">Búsqueda</button>
+        <button class="tab" onclick="openTab(event, 'estado')">Cambiar Estado</button>
+        <button class="tab" onclick="openTab(event, 'rastreo')">Rastreo</button>
+        <button class="tab" onclick="openTab(event, 'history')">Historial</button>
+    </div>
+
+    <!-- Registro -->
+    <div id="registro" class="tab-content active">
+        <h1>Registro de Camiones</h1>
+        <form id="camion-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id-camion" class="required">ID Camión</label>
+                    <input type="text" id="id-camion" placeholder="Ingrese el ID del camión" required>
+                </div>
+                <div class="form-group">
+                    <label for="placa" class="required">Placa</label>
+                    <input type="text" id="placa" placeholder="Ingrese la placa del camión" maxlength="10" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="modelo">Modelo</label>
+                    <input type="text" id="modelo" placeholder="Ingrese el modelo del camión">
+                </div>
+                <div class="form-group">
+                    <label for="capacidad">Capacidad (kg)</label>
+                    <input type="number" id="capacidad" placeholder="Ingrese la capacidad en kg">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="estado" class="required">Estado</label>
+                <select id="estado" required>
+                    <option value="">Seleccione un estado</option>
+                    <option value="Disponible">Disponible</option>
+                    <option value="En Ruta">En Ruta</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+            </div>
+
+            <button type="submit">Registrar Camión</button>
+        </form>
+    </div>
+
+    <!-- Búsqueda -->
+    <div id="busqueda" class="tab-content">
+        <h1>Búsqueda de Camiones</h1>
+        <form>
+            <div class="form-group">
+                <label for="busqueda-camion">Buscar camión</label>
+                <input type="text" id="busqueda-camion" placeholder="Ingrese ID, placa o modelo del camión">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="resultado-id">ID Camión</label>
+                    <input type="text" id="resultado-id" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="resultado-placa">Placa</label>
+                    <input type="text" id="resultado-placa" disabled>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="resultado-modelo">Modelo</label>
+                    <input type="text" id="resultado-modelo" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="resultado-capacidad">Capacidad (kg)</label>
+                    <input type="number" id="resultado-capacidad" disabled>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="resultado-estado">Estado</label>
+                <input type="text" id="resultado-estado" disabled>
+            </div>
+
+            <div class="form-group">
+                <button type="button" id="buscar-button">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Cambio de Estado -->
+    <div id="cambio-estado" class="tab-content">
+        <h1>Cambiar Estado de Camión</h1>
+        <form id="estado-form" data-camion-id="">
+            <!-- Buscar camión por placa -->
+            <div class="form-group">
+                <label for="buscar-placa">Placa o ID del camión:</label>
+                <input type="text" id="buscar-placa" required>
+                <button type="button" id="buscar-camion-button" style="margin-top: 10px;">Buscar</button>
+            </div>
+
+            <!-- Datos del camión encontrados -->
+            <div id="camion-info" style="margin-top: 15px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estado-actual">Estado Actual:</label>
+                        <input type="text" id="estado-actual" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevo-estado">Nuevo Estado:</label>
+                        <select id="nuevo-estado" required>
+                            <option value="">Seleccione un estado</option>
+                            <option value="Disponible">Disponible</option>
+                            <option value="En Ruta">En Ruta</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón para cambiar el estado -->
+            <div class="form-group">
+                <button type="button" id="cambiar-estado-button">Cambiar Estado</button>
+            </div>
+        </form>
+    </div>
+
+    
+    <!-- Rastreo -->
+    <div id="rastreo" class="tab-content">
+        <h1>Rastreo de Camión</h1>
+        <div style="width: 100%; height: 400px;">
+            <iframe 
+                width="100%" 
+                height="100%" 
+                style="border:0;" 
+                loading="lazy"
+                allowfullscreen 
+                referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387190.2799156447!2d-74.25986371093068!3d40.69767006717885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQxJzUxLjYiTiA3NMKwMTUnMzAuMCJX!5e0!3m2!1ses!2s!4v1620238285123!5m2!1ses!2s">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <div id="history" class="tab-content">
+        <h1>Historial de Operaciones</h1>
+        <div id="history-list">
+            <!-- Las entradas del historial se agregarán aquí -->
+        </div>
+    </div>
+</div>
+
+<script>
+const BASE_URL = "http://localhost:3003";
+let history = JSON.parse(localStorage.getItem('camionHistory')) || [];
+
+// Notificación
+function showNotification(message, isSuccess = true) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.backgroundColor = isSuccess ? '#2e7d32' : '#d32f2f';
+    notification.style.display = 'block';
+    setTimeout(() => notification.style.display = 'none', 3000);
+}
+
+// Tabs
+function openTab(evt, tabName) {
+    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+    
+    // Si es la pestaña de historial, actualizar la vista
+    if (tabName === 'history') {
+        updateHistoryView();
+    }
+}
+
+// Actualizar vista del historial
+function updateHistoryView() {
+    const historyList = document.getElementById('history-list');
+    historyList.innerHTML = '';
+    
+    // Ordenar historial por fecha (más reciente primero)
+    const sortedHistory = [...history].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    sortedHistory.forEach(entry => {
+        const entryElement = document.createElement('div');
+        entryElement.className = 'history-entry';
+        
+        const date = new Date(entry.timestamp);
+        const formattedDate = date.toLocaleDateString();
+        const formattedTime = date.toLocaleTimeString();
+        
+        entryElement.innerHTML = `
+            <div class="history-time">${formattedDate} - ${formattedTime}</div>
+            <div class="history-action">${entry.action}</div>
+            <div class="history-details">${entry.details}</div>
+        `;
+        
+        historyList.appendChild(entryElement);
+    });
+}
+
+// Agregar entrada al historial
+function addToHistory(action, details) {
+    const newEntry = {
+        timestamp: new Date().toISOString(),
+        action,
+        details
+    };
+    
+    history.unshift(newEntry); // Agregar al principio del array
+    localStorage.setItem('camionHistory', JSON.stringify(history));
+    
+    // Si estamos en la pestaña de historial, actualizar la vista
+    if (document.getElementById('history').classList.contains('active')) {
+        updateHistoryView();
+    }
+}
+
+// Envío del formulario de registro
+document.getElementById('camion-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const camionData = {
+        id_camion: document.getElementById('id-camion').value,
+        placa: document.getElementById('placa').value,
+        modelo: document.getElementById('modelo').value,
+        capacidad: document.getElementById('capacidad').value ? parseInt(document.getElementById('capacidad').value) : null,
+        estado: document.getElementById('estado').value
+    };
+
+    if (!camionData.id_camion || !camionData.placa || !camionData.estado) {
+        showNotification('Por favor complete todos los campos requeridos', false);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/camiones`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(camionData)
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showNotification('Camión registrado exitosamente');
+            document.getElementById('camion-form').reset();
+            
+            // Agregar al historial
+            addToHistory(
+                'Nuevo camión registrado',
+                `ID: ${camionData.id_camion} | Placa: ${camionData.placa} | Estado: ${camionData.estado}`
+            );
+        } else {
+            showNotification('Error al registrar: ' + (data.message || 'Desconocido'), false);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al conectar con el servidor', false);
+    }
+});
+
+// Búsqueda de camiones
+document.getElementById('buscar-button').addEventListener('click', async () => {
+    const query = document.getElementById('busqueda-camion').value.trim();
+    if (!query) {
+        showNotification('Por favor, ingrese un término de búsqueda');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/camiones/buscar?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (!res.ok) {
+            showNotification(data.message || 'Error al buscar el camión');
+            return;
+        }
+
+        if (Array.isArray(data) && data.length > 0) {
+            const camion = data[0];
+            document.getElementById('resultado-id').value = camion.id_camion || '';
+            document.getElementById('resultado-placa').value = camion.placa || '';
+            document.getElementById('resultado-modelo').value = camion.modelo || '';
+            document.getElementById('resultado-capacidad').value = camion.capacidad || '';
+            document.getElementById('resultado-estado').value = camion.estado || '';
+            
+            // Guardar el ID del camión para el formulario de estado
+            document.getElementById('estado-form').setAttribute('data-camion-id', camion.id_camion);
+            
+            // Agregar al historial
+            addToHistory(
+                'Búsqueda de camión',
+                `Camión consultado: ${camion.placa} | Estado: ${camion.estado}`
+            );
+        } else {
+            showNotification('Camión no encontrado');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al buscar el camión');
+    }
+});
+
+// Búsqueda para cambio de estado
+document.getElementById('buscar-camion-button').addEventListener('click', async function() {
+    const query = document.getElementById('buscar-placa').value.trim();
+    if (!query) {
+        showNotification('Por favor ingrese una placa o ID de camión', false);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/camiones/buscar?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        
+        if (response.ok && data.length > 0) {
+            const camion = data[0];
+            document.getElementById('estado-actual').value = camion.estado;
+            document.getElementById('estado-form').setAttribute('data-camion-id', camion.id_camion);
+            showNotification('Camión encontrado');
+        } else {
+            showNotification('Camión no encontrado', false);
+        }
+    } catch (error) {
+        console.error('Error al buscar camión:', error);
+        showNotification('Error al buscar el camión', false);
+    }
+});
+
+// Cambio de estado
+document.getElementById('cambiar-estado-button').addEventListener('click', async function() {
+    const camionId = document.getElementById('estado-form').getAttribute('data-camion-id');
+    const nuevoEstado = document.getElementById('nuevo-estado').value;
+    
+    if (!camionId) {
+        showNotification('Primero busque un camión', false);
+        return;
+    }
+
+    if (!nuevoEstado) {
+        showNotification('Seleccione un nuevo estado', false);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/camiones/${camionId}/estado`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                estado: nuevoEstado
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al cambiar estado');
+        }
+
+        const data = await response.json();
+        showNotification('Estado actualizado exitosamente');
+        
+        // Actualizar el estado mostrado
+        document.getElementById('estado-actual').value = nuevoEstado;
+        
+        // Agregar al historial
+        addToHistory(
+            'Cambio de estado',
+            `ID: ${camionId} | Nuevo estado: ${nuevoEstado}`
+        );
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification(error.message, false);
+    }
+});
+
+// Función debounce para limitar las llamadas al servidor
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+
+</script>
+
+</body>
+</html>

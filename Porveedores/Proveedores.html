@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Proveedores</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+            border: none;
+            outline: none;
+            transition: 0.3s;
+            font-weight: 600;
+            color: #555;
+        }
+        .tab:hover {
+            background-color: #e9e9e9;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #2e7d32;
+            color: #2e7d32;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h1 {
+            font-size: 1.5em;
+            margin-top: 0;
+            color: #2e7d32;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .divider {
+            border-top: 1px solid #e0e0e0;
+            margin: 15px 0;
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .stats-table th, .stats-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .stats-table th {
+            background-color: #f8f8f8;
+            color: #2e7d32;
+        }
+        .required::after {
+            content: " *";
+            color: #d32f2f;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            background-color: #2e7d32;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="notification" id="notification"></div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="openTab(event, 'insertion')">Registro</button>
+        <button class="tab" onclick="openTab(event, 'search')">Búsqueda</button>
+        <button class="tab" onclick="openTab(event, 'list')">Listado</button>
+    </div>
+
+    <!-- Registro de Proveedores -->
+    <div id="insertion" class="tab-content active">
+        <h1>Registro de Proveedores</h1>
+        <form id="provider-form">
+            <div class="form-group">
+                <label for="provider-id" class="required">ID Proveedor</label>
+                <input type="text" id="provider-id" placeholder="Ingrese el ID del proveedor" required>
+            </div>
+
+            <div class="form-group">
+                <label for="provider-name" class="required">Nombre</label>
+                <input type="text" id="provider-name" placeholder="Ingrese el nombre del proveedor" required>
+            </div>
+
+            <div class="form-group">
+                <label for="provider-contact">Contacto</label>
+                <input type="text" id="provider-contact" placeholder="Persona de contacto">
+            </div>
+
+            <div class="form-group">
+                <label for="provider-address">Dirección</label>
+                <textarea id="provider-address" placeholder="Ingrese la dirección del proveedor"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="provider-phone">Teléfono</label>
+                    <input type="text" id="provider-phone" placeholder="Número de teléfono">
+                </div>
+                <div class="form-group">
+                    <label for="provider-email">Correo electrónico</label>
+                    <input type="text" id="provider-email" placeholder="Correo electrónico">
+                </div>
+            </div>
+
+            <button type="submit">Guardar Proveedor</button>
+        </form>
+    </div>
+
+    <!-- Búsqueda de Proveedores -->
+    <div id="search" class="tab-content">
+        <h1>Búsqueda de Proveedores</h1>
+        <form id="search-form">
+            <div class="form-group">
+                <label for="search-criteria">Buscar por:</label>
+                <select id="search-criteria">
+                    <option value="id">ID Proveedor</option>
+                    <option value="name">Nombre</option>
+                    <option value="contact">Contacto</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="search-term">Término de búsqueda</label>
+                <input type="text" id="search-term" placeholder="Ingrese término de búsqueda">
+            </div>
+
+            <button type="button" id="search-button">Buscar</button>
+
+            <div class="divider"></div>
+
+            <div id="search-results">
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Contacto</th>
+                            <th>Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                        <!-- Los resultados se insertarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+    <!-- Listado de Proveedores -->
+    <div id="list" class="tab-content">
+        <h1>Listado de Proveedores</h1>
+        <div class="form-group">
+            <button type="button" id="load-providers">Cargar todos los proveedores</button>
+        </div>
+        
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                </tr>
+            </thead>
+            <tbody id="providers-list">
+                <!-- La lista de proveedores se insertará aquí -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const BASE_URL = "http://localhost:3002";
+
+// Notificación
+function showNotification(message, isSuccess = true) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.backgroundColor = isSuccess ? '#2e7d32' : '#d32f2f';
+    notification.style.display = 'block';
+    setTimeout(() => notification.style.display = 'none', 3000);
+}
+
+// Tabs
+function openTab(evt, tabName) {
+    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+}
+
+// Envío del formulario de proveedores
+document.getElementById('provider-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const providerData = {
+        id_provendor: document.getElementById('provider-id').value,
+        nodeve: document.getElementById('provider-name').value,
+        contacto: document.getElementById('provider-contact').value,
+        direction: document.getElementById('provider-address').value,
+        telefono: document.getElementById('provider-phone').value,
+        correo: document.getElementById('provider-email').value
+    };
+
+    if (!providerData.id_provendor || !providerData.nodeve) {
+        showNotification('Por favor complete todos los campos requeridos', false);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/proveedores`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(providerData)
+        });
+        const data = await response.json();
+        if (response.ok) {
+            showNotification('Proveedor guardado exitosamente');
+            document.getElementById('provider-form').reset();
+        } else {
+            showNotification('Error al guardar: ' + (data.message || 'Desconocido'), false);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al conectar con el servidor', false);
+    }
+});
+
+// Búsqueda de proveedores
+document.getElementById('search-button').addEventListener('click', async () => {
+    const criteria = document.getElementById('search-criteria').value;
+    const term = document.getElementById('search-term').value.trim();
+    
+    if (!term) {
+        showNotification('Por favor, ingrese un término de búsqueda');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/proveedores/buscar?${criteria}=${encodeURIComponent(term)}`);
+        const data = await res.json();
+        
+        const resultsBody = document.getElementById('results-body');
+        resultsBody.innerHTML = '';
+        
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(provider => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${provider.id_provendor || ''}</td>
+                    <td>${provider.nodeve || ''}</td>
+                    <td>${provider.contacto || ''}</td>
+                    <td>${provider.telefono || ''}</td>
+                `;
+                resultsBody.appendChild(row);
+            });
+        } else {
+            showNotification('No se encontraron proveedores');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al buscar proveedores');
+    }
+});
+
+// Cargar todos los proveedores
+document.getElementById('load-providers').addEventListener('click', async () => {
+    try {
+        const res = await fetch(`${BASE_URL}/api/proveedores`);
+        const data = await res.json();
+        
+        const providersList = document.getElementById('providers-list');
+        providersList.innerHTML = '';
+        
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(provider => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${provider.id_provendor || ''}</td>
+                    <td>${provider.nodeve || ''}</td>
+                    <td>${provider.contacto || ''}</td>
+                    <td>${provider.telefono || ''}</td>
+                    <td>${provider.correo || ''}</td>
+                `;
+                providersList.appendChild(row);
+            });
+        } else {
+            showNotification('No hay proveedores registrados');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al cargar proveedores');
+    }
+});
+</script>
+</body>
+</html>

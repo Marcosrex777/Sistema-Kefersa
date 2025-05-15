@@ -1,0 +1,15 @@
+### Crear Producto
+POST http://localhost:3002/api/productos 
+Content-Type: application/json  
+
+
+{
+  "nombre_producto": "Producto de prueba",
+  "descripcion": "Descripción del producto de prueba",
+  "precio_unitario": 100.5,
+  "stock": 50,
+  "id_proveedor": 1,
+  "fecha": "2025-12-31",
+  "unidad": "pieza"
+}
+

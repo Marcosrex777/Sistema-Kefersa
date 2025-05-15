@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestión de Tiendas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+            border: none;
+            outline: none;
+            transition: 0.3s;
+            font-weight: 600;
+            color: #555;
+        }
+        .tab:hover {
+            background-color: #e9e9e9;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #2e7d32;
+            color: #2e7d32;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h1 {
+            font-size: 1.5em;
+            margin-top: 0;
+            color: #2e7d32;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], input[type="date"], input[type="email"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            background-color: #2e7d32;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+        #history-list div {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="notification" id="notification"></div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab active" onclick="openTab(event, 'insertion')">Inserción</button>
+        <button class="tab" onclick="openTab(event, 'stock')">Búsqueda</button>
+        <button class="tab" onclick="openTab(event, 'retiro')">Actualizar</button>
+        <button class="tab" onclick="openTab(event, 'history')">Historial</button>
+    </div>
+
+    <div id="insertion" class="tab-content active">
+        <h1>Registro de Tiendas</h1>
+        <form id="product-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tienda-id">ID Tienda</label>
+                    <input type="text" id="tienda-id" placeholder="ID automático"  />
+                </div>
+                <div class="form-group">
+                    <label for="nombre-tienda">Nombre Tienda</label>
+                    <input type="text" id="nombre-tienda" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="direccion-tienda">Dirección</label>
+                <textarea id="direccion-tienda" placeholder="Ingrese dirección de la tienda" ></textarea>
+       
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="telefono-tienda">Teléfono</label>
+                    <input type="text" id="telefono-tienda"  placeholder="Ingrese el teléfono"/>
+                </div>
+                <div class="form-group">
+                    <label for="correo-tienda">Correo Electrónico</label>
+                    <input type="email" id="correo-tienda" placeholder="Ingrese el correo"/>
+                </div>
+            </div>
+            <button type="submit">Guardar Tienda</button>
+        </form>
+    </div>
+
+    <div id="stock" class="tab-content">
+        <h1>Búsqueda de Tiendas</h1>
+        <form>
+            <div class="form-group">
+                <label for="tienda-search">Buscar tienda</label>
+                <input type="text" id="tienda-search" placeholder="Ingrese el nombre o el codigo de la tienda"/>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tienda-nombre">Nombre</label>
+                    <input type="text" id="tienda-nombre" disabled placeholder="Nombre de la tienda"/>
+                </div>
+                <div class="form-group">
+                    <label for="tienda-direccion">Dirección</label>
+                    <input type="text" id="tienda-direccion" disabled  placeholder="Nombre de la tienda" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tienda-telefono">Teléfono</label>
+                    <input type="text" id="tienda-telefono" disabled  placeholder="Nombre de la tienda"/>
+                </div>
+                <div class="form-group">
+                    <label for="tienda-correo">Correo</label>
+                    <input type="email" id="tienda-correo" disabled placeholder="Nombre de la tienda"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" id="search-button">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="retiro" class="tab-content">
+        <h1>Actualizar Tienda</h1>
+        <form id="update-form">
+            <div class="form-group">
+                <label for="update-search">Buscar por ID o nombre</label>
+                <input type="text" id="update-search" placeholder="Ingrese el ID o nombre de la tienda"/>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="update-id">ID Tienda</label>
+                    <input type="text" id="update-id" disabled  placeholder="Codigo de la tienda"/>
+                </div>
+                <div class="form-group">
+                    <label for="update-nombre">Nombre Tienda</label>
+                    <input type="text" id="update-nombre" required placeholder= "Nombre de la tienda" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="update-direccion">Dirección</label>
+                <textarea id="update-direccion" placeholder="Dirección de la tienda"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="update-telefono">Teléfono</label>
+                    <input type="text" id="update-telefono" placeholder="Telefono de la tienda" />
+                </div>
+                <div class="form-group">
+                    <label for="update-correo">Correo Electrónico</label>
+                    <input type="email" id="update-correo" placeholder="Correo de la tienda"/>
+                </div>
+            </div>
+            <button type="submit">Actualizar Tienda</button>
+        </form>
+    </div>
+
+    <!-- Historial -->
+    <div id="history" class="tab-content">
+        <h1>Historial de Operaciones</h1>
+        <div id="history-list">
+            <!-- Las entradas del historial se agregarán aquí -->
+        </div>
+    </div>
+</div>
+
+<script>
+const BASE_URL = "http://localhost:3004";
+let tiendaCargada = false;
+
+function showNotification(message, isSuccess = true) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.backgroundColor = isSuccess ? '#2e7d32' : '#d32f2f';
+    notification.style.display = 'block';
+    setTimeout(() => notification.style.display = 'none', 3000);
+}
+
+function openTab(evt, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabs = document.querySelectorAll('.tab');
+    tabContents.forEach(c => c.classList.remove('active'));
+    tabs.forEach(t => t.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    evt.currentTarget.classList.add('active');
+}
+
+function addToHistory(titulo, descripcion) {
+    const historyList = document.getElementById('history-list');
+    const entry = document.createElement('div');
+    entry.style.borderBottom = '1px solid #ddd';
+    entry.style.padding = '10px 0';
+    entry.innerHTML = `<strong>${titulo}</strong><br><span>${descripcion}</span>`;
+    historyList.prepend(entry); // Agrega al inicio
+}
+
+document.getElementById('product-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const tiendaData = {
+        nombre_tienda: document.getElementById('nombre-tienda').value,
+        direccion: document.getElementById('direccion-tienda').value,
+        telefono: document.getElementById('telefono-tienda').value,
+        correo: document.getElementById('correo-tienda').value
+    };
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/tiendas`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(tiendaData)
+        });
+        const data = await response.json();
+        if (response.ok) {
+            document.getElementById('product-form').reset();
+            document.getElementById('tienda-id').value = data.id_tienda || '';
+            showNotification('Tienda guardada exitosamente');
+            addToHistory(
+                'Nueva tienda registrada',
+                `ID: ${data.id_tienda} | Nombre: ${tiendaData.nombre_tienda} | Dirección: ${tiendaData.direccion}`
+            );
+        } else {
+            showNotification('Error al guardar: ' + (data.message || 'Desconocido'), false);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al conectar con el servidor', false);
+    }
+});
+
+document.getElementById('search-button').addEventListener('click', async () => {
+    const searchTerm = document.getElementById('tienda-search').value.trim();
+    if (!searchTerm) return showNotification('Ingrese un término de búsqueda', false);
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/tiendas/buscar?q=${encodeURIComponent(searchTerm)}`);
+        const data = await res.json();
+        if (data.length > 0) {
+            const tienda = data[0];
+            document.getElementById('tienda-nombre').value = tienda.nombre_tienda || '';
+            document.getElementById('tienda-direccion').value = tienda.direccion || '';
+            document.getElementById('tienda-telefono').value = tienda.telefono || '';
+            document.getElementById('tienda-correo').value = tienda.correo || '';
+        } else {
+            showNotification('Tienda no encontrada', false);
+        }
+    } catch (error) {
+        showNotification('Error al buscar la tienda', false);
+    }
+});
+
+document.getElementById('update-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const id = document.getElementById('update-id').value;
+    const query = document.getElementById('update-search').value.trim();
+
+    if (!tiendaCargada) {
+        if (!query) return showNotification('Ingrese ID o nombre para buscar', false);
+        try {
+            const res = await fetch(`${BASE_URL}/api/tiendas/buscar?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            if (data.length) {
+                const tienda = data[0];
+                document.getElementById('update-id').value = tienda.id_tienda;
+                document.getElementById('update-nombre').value = tienda.nombre_tienda;
+                document.getElementById('update-direccion').value = tienda.direccion;
+                document.getElementById('update-telefono').value = tienda.telefono;
+                document.getElementById('update-correo').value = tienda.correo;
+                tiendaCargada = true;
+                showNotification('Tienda encontrada. Edita y vuelve a presionar para actualizar.');
+            } else {
+                showNotification('Tienda no encontrada', false);
+            }
+        } catch (error) {
+            showNotification('Error de red al buscar tienda', false);
+        }
+        return;
+    }
+
+    const tiendaData = {
+        nombre_tienda: document.getElementById('update-nombre').value,
+        direccion: document.getElementById('update-direccion').value,
+        telefono: document.getElementById('update-telefono').value,
+        correo: document.getElementById('update-correo').value
+    };
+
+    if (!id) return showNotification('No hay tienda seleccionada para actualizar', false);
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/tiendas/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tiendaData)
+        });
+        if (res.ok) {
+            showNotification('Tienda actualizada correctamente');
+            tiendaCargada = false;
+            document.getElementById('update-form').reset();
+            document.getElementById('update-id').value = '';
+        } else {
+            showNotification('Error al actualizar tienda', false);
+        }
+    } catch (error) {
+        showNotification('Error de red al actualizar', false);
+    }
+});
+</script>
+
+</body>
+</html>

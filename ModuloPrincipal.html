@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="ModuloPrincipal.css" >
+    <script type="Module"   src="ModuloPrincipal.jsx"></script>
+
+
+    <title>KEFRESA S.A</title>
+    
+
+</head>
+
+<body>
+    <div class="header">
+        <button class="button" onclick="abrirModal('Productos', 'Productos/Productos.html')">Productos</button>
+        <button class="button" onclick="abrirModal('Proveedores', 'Proveedores/Proveedores.html')">Proveedores</button>
+        <button class="button" onclick="abrirModal('Gestión de Camiones', 'Camiones/Camiones.html')">Camiones</button>
+        <button class="button" onclick="abrirModal('Gestión de Clientes', 'Clientes/Clientes.html')">Clientes</button>
+        <button class="button" onclick="abrirModal('Gestión de Clientes', 'Compras/Compras.html')">Compra</button>
+        <button class="button" onclick="abrirModal('Gestión de Clientes', 'ModuloEmpleados.html')">Ventas</button>
+    </div>
+
+    <div class="main-content">
+
+        <h1>KEFERSA S.A</h1>
+
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Título del Modal</span>
+                <button class="close-btn" onclick="cerrarModal()">&times;</button>
+            </div>
+            <iframe class="modal-iframe" id="modalIframe" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <script src="ModalProducto.js"></script>
+
+
+
+  
+</body>
+
+</html>
