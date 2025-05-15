@@ -27,9 +27,8 @@ app.use('/compras', compras);
 app.use('/productos', productos);
 app.use('/proveedores', proveedores);
 app.use('/ventas', ventas);
-app.use('/api/usuarios', usuarios);
+app.use('/api/index', index);
 
-// Ruta raíz para verificar conexión a BD
 app.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
